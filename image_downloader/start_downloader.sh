@@ -3,9 +3,9 @@
 # and save its output to a log file
 
 # Set the base directory
-BASE_DIR="$HOME/image_downloader"
+BASE_DIR="$HOME/athena-full-circle/image_downloader"
 SCRIPT_PATH="$BASE_DIR/image_downloader.py"
-URL_LIST="$BASE_DIR/urls.txt"
+URL_LIST="$BASE_DIR/secrets/urls.txt"
 OUTPUT_DIR="$BASE_DIR/images"
 LOG_DIR="$BASE_DIR/logs"
 
@@ -30,7 +30,7 @@ fi
 
 # Start the downloader in the background
 echo "Starting image downloader at $(date)" | tee -a "$LOG_FILE"
-nohup python3 "$SCRIPT_PATH" --urls "$URL_LIST" --output "$OUTPUT_DIR" --interval 30 >> "$LOG_FILE" 2>&1 &
+nohup uv run "$SCRIPT_PATH" --urls "$URL_LIST" --output "$OUTPUT_DIR" --interval 30 >> "$LOG_FILE" 2>&1 &
 
 # Save the process ID
 echo $! > "$BASE_DIR/downloader.pid"
