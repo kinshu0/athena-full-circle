@@ -1,33 +1,41 @@
 #!/bin/bash
 
 # Set variables
-ET_TIMEZONE="America/New_York"
-S3_BUCKET="s3://athena-full-circle/images"
+BUCKET_NAME="s3://athena-full-circle/images"
 BASE_DIR="$HOME/athena-full-circle/image_downloader/images"
 DATE=$(TZ=$ET_TIMEZONE date +%Y-%m-%d)
-FOLDER="$BASE_DIR/$DATE"
-TAR_FILE="$BASE_DIR/$DATE.tar.gz"
+FOLDER="$DATE"
+ZIP_FILE="$DATE.tar.gz"
 
-# Check if folder exists
-if [ -d "$FOLDER" ]; then
-    echo "Compressing folder: $FOLDER"
-    tar -cf - "$FOLDER" --verbose | pigz -9 > "$TAR_FILE"
-
-    if [ $? -eq 0 ]; then
-        echo "Upload to S3: $TAR_FILE"
-        aws s3 cp "$TAR_FILE" "$S3_BUCKET/"
-
-        if [ $? -eq 0 ]; then
-            echo "Upload successful, deleting local files..."
-            rm -rf "$FOLDER" "$TAR_FILE"
-        else
-            echo "S3 upload failed. Keeping files for debugging."
-            exit 2
-        fi
-    else
-        echo "Compression failed."
-        exit 1
-    fi
-else
-    echo "Folder $FOLDER not found, skipping."
+# Check if the folder exists
+if [ ! -d "$BASE_DIR/$FOLDER" ]; then
+    echo "Folder $BASE_DIR/$FOLDER not found, exiting."
+    exit 1
 fi
+
+# Compress with proper relative path handling
+echo "Compressing $FOLDER..."
+cd "$BASE_DIR" || exit 1
+tar --use-compress-program=pigz -cf "$ZIP_FILE" "$FOLDER"
+
+# Verify compression success
+if [ $? -ne 0 ]; then
+    echo "Compression failed, exiting."
+    exit 1
+fi
+
+# Upload to S3
+echo "Uploading $ZIP_FILE to S3..."
+aws s3 cp "$ZIP_FILE" "$BUCKET_NAME/"
+
+# Verify upload success and delete files if successful
+if [ $? -eq 0 ]; then
+    echo "Upload successful, deleting local files..."
+    rm -rf "$FOLDER"
+    rm -f "$ZIP_FILE"
+else
+    echo "Upload failed, keeping local files."
+    exit 1
+fi
+
+echo "Backup completed successfully."
