@@ -11,3 +11,8 @@ wheels/
 
 # Configuration secrets
 secrets/
+
+# Data
+data.zip
+data/
+images/

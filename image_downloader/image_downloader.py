@@ -32,6 +32,8 @@ def get_urls():
         logging.error(f"Failed to read URLs file: {str(e)}")
         return []
 
+urls = get_urls()
+
 def create_folder_structure():
     """Create folder structure based on current ET date."""
     now = datetime.datetime.now(eastern)
@@ -88,8 +90,6 @@ def download_image(url):
 
 def download_all_images():
     """Download all images from the URLs list concurrently."""
-    urls = get_urls()
-    
     # Use ThreadPoolExecutor to download images concurrently
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         executor.map(download_image, urls)
