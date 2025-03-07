@@ -3,7 +3,7 @@
 # Set variables
 BUCKET_NAME="s3://athena-full-circle/images"
 BASE_DIR="$HOME/athena-full-circle/image_downloader/images"
-DATE=$(TZ=$ET_TIMEZONE date +%Y-%m-%d)
+DATE=$(TZ="America/New_York" date +%Y-%m-%d)
 FOLDER="$DATE"
 ZIP_FILE="$DATE.tar.gz"
 
