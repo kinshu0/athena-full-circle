@@ -16,3 +16,6 @@ secrets/
 data.zip
 data/
 images/
+
+.DS_Store
+
